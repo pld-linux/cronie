@@ -63,7 +63,7 @@ however this could be overloaded in settings.
 %configure \
 	SYSCRONTAB=/etc/cron.d/crontab \
 	SYS_CROND_DIR=/etc/cron.d \
-	--sysconfdir=/etc/cron.d \
+	--sysconfdir=/etc/cron \
 	--with-pam \
 	--with%{?!with_selinux:out}-selinux \
 	--with-audit \
