@@ -1,0 +1,76 @@
+#!/bin/sh
+#
+# crond		Start/Stop the cron clock daemon.
+#
+# chkconfig:	2345 40 60
+# description:	cron is a standard UNIX program that runs user-specified \
+#		programs at periodic scheduled times. cronie adds a \
+#		number of features to the basic UNIX cron, including better \
+#		security and more powerful configuration options.
+#
+# processname:	crond
+# config:	/etc/crontab
+# pidfile:	/var/run/crond.pid
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Get service config
+[ -f /etc/sysconfig/cron ] && . /etc/sysconfig/cron
+
+start() {
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/crond ]; then
+		msg_starting "cronie"
+		daemon /usr/sbin/crond
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/crond
+	else
+		msg_already_running "cronie"
+	fi
+}
+
+stop() {
+	if [ -f /var/lock/subsys/crond ]; then
+		msg_stopping "cronie"
+		killproc crond
+		rm -f /var/lock/subsys/crond
+	else
+		msg_not_running "cronie"
+	fi
+}
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  status)
+	status crond
+	exit $?
+	;;
+  restart)
+	stop
+	start
+	;;
+  reload|force-reload)
+	if [ -f /var/lock/subsys/crond ]; then
+		msg_reloading "cronie"
+		killproc crond -HUP
+		RETVAL=$?
+	else
+		msg_not_running "cronie"
+		exit 7
+	fi
+	;;
+  *)
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	exit 3
+esac
+
+exit $RETVAL

@@ -1,0 +1,6 @@
+/var/log/cron {
+	create 660 root crontab
+	postrotate
+		/bin/killall -HUP crond
+	endscript
+}
