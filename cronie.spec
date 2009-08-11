@@ -15,7 +15,6 @@ Source2:	cron.logrotate
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
-Patch0:		%{name}-paths.patch
 URL:		https://fedorahosted.org/cronie/
 BuildRequires:	audit-libs-devel
 %{?with_selinux:BuildRequires:	libselinux-devel}
@@ -59,10 +58,12 @@ however this could be overloaded in settings.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 %configure \
+	SYSCRONTAB=/etc/cron.d/crontab \
+	SYS_CROND_DIR=/etc/cron.d \
+	--sysconfdir=/etc/cron.d \
 	--with-pam \
 	--with%{?!with_selinux:out}-selinux \
 	--with-audit \
