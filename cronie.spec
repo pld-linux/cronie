@@ -5,7 +5,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.1
-Release:	1
+Release:	2
 License:	MIT and BSD and GPLv2
 Group:		Daemons
 Source0:	%{name}-%{version}.tar.gz
@@ -74,7 +74,7 @@ however this could be overloaded in settings.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/var/{log,spool/cron},%{_mandir}} \
+install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir}} \
 	$RPM_BUILD_ROOT/etc/{rc.d/init.d,logrotate.d,sysconfig} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{cron,cron.{d,hourly,daily,weekly,monthly},pam.d}
 
@@ -184,3 +184,5 @@ chmod 754 /etc/rc.d/init.d/crond
 %attr(755,root,root) %{_sysconfdir}/cron.hourly/0anacron
 %{_mandir}/man5/anacrontab.5*
 %{_mandir}/man8/anacron.8*
+
+%attr(1730,root,crontab) /var/spool/anacron
