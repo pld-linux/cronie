@@ -147,6 +147,15 @@ fi
 /sbin/chkconfig --del crond
 /sbin/chkconfig --add crond
 
+%triggerun -- vixie-cron
+# Prevent preun from crond from working
+chmod a-x /etc/rc.d/init.d/crond
+
+%triggerpostun -- vixie-cron
+# Restore what triggerun removed
+chmod 754 /etc/rc.d/init.d/crond
+/sbin/chkconfig --add crond
+
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README
