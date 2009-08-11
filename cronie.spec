@@ -8,7 +8,7 @@ Version:	1.4.1
 Release:	1
 License:	MIT and BSD and GPLv2
 Group:		Daemons
-Source0:	https://fedorahosted.org/cronie/attachment/wiki/WikiStart/%{name}-%{version}.tar.gz?format=raw
+Source0:	%{name}-%{version}.tar.gz
 # Source0-md5:	9c089d2035b9fa8263bc71da3eb31cdd
 Source1:	%{name}.init
 Source2:	cron.logrotate
