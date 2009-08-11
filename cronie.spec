@@ -8,17 +8,18 @@ Version:	1.4.1
 Release:	0.1
 License:	MIT and BSD and GPLv2
 Group:		Daemons
-Source0:	https://fedorahosted.org/cronie/attachment/wiki/WikiStart/cronie-1.4.1.tar.gz?format=raw
+Source0:	https://fedorahosted.org/cronie/attachment/wiki/WikiStart/%{name}-%{version}.tar.gz?format=raw
 # Source0-md5:	9c089d2035b9fa8263bc71da3eb31cdd
 Source1:	%{name}.init
 Source2:	cron.logrotate
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
+Patch0:		%{name}-paths.patch
 URL:		https://fedorahosted.org/cronie/
+BuildRequires:	audit-libs-devel
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
-BuildRequires:	audit-libs-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -33,31 +34,32 @@ Requires:	rc-scripts
 Provides:	crondaemon
 Provides:	crontabs = 1.7
 Provides:	group(crontab)
-Provides: vixie-cron = 4:4.4
-Obsoletes: vixie-cron <= 4:4.3
+Provides:	vixie-cron = 4:4.4
 Obsoletes:	crondaemon
 Obsoletes:	crontabs
+Obsoletes:	vixie-cron <= 4:4.3
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Cronie contains the standard UNIX daemon crond that runs specified programs at
-scheduled times and related tools. It is based on the original cron and
-has security and configuration enhancements like the ability to use pam and
-SELinux.
+Cronie contains the standard UNIX daemon crond that runs specified
+programs at scheduled times and related tools. It is based on the
+original cron and has security and configuration enhancements like the
+ability to use pam and SELinux.
 
 %package anacron
-Summary: Utility for running regular jobs
-Group: Base
-Provides: anacron = 2.4
-Obsoletes: anacron <= 2.3
+Summary:	Utility for running regular jobs
+Group:		Base
+Provides:	anacron = 2.4
+Obsoletes:	anacron <= 2.3
 
 %description anacron
-Anacron becames part of cronie. Anacron is used only for running regular jobs.
-The default settings execute regular jobs by anacron, however this could be
-overloaded in settings.
+Anacron becames part of cronie. Anacron is used only for running
+regular jobs. The default settings execute regular jobs by anacron,
+however this could be overloaded in settings.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %configure \
@@ -169,6 +171,6 @@ fi
 %files anacron
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/anacron
-%attr(0755,root,root) %{_sysconfdir}/cron.hourly/0anacron
+%attr(755,root,root) %{_sysconfdir}/cron.hourly/0anacron
 %{_mandir}/man5/anacrontab.5*
 %{_mandir}/man8/anacron.8*
