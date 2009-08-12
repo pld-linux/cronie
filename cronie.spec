@@ -65,7 +65,7 @@ however this could be overloaded in settings.
 	SYS_CROND_DIR=/etc/cron.d \
 	--sysconfdir=/etc/cron \
 	--with-pam \
-	--with%{?!with_selinux:out}-selinux \
+	--with%{!?with_selinux:out}-selinux \
 	--with-audit \
 	--with-inotify \
 	--enable-anacron
@@ -82,7 +82,6 @@ install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir}} \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install contrib/0anacron $RPM_BUILD_ROOT/etc/cron.hourly/0anacron
-
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/crond
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/cron
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
