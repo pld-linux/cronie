@@ -17,11 +17,11 @@ Source2:	cron.logrotate
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
+Patch0:		inotify-nosys.patch
 URL:		https://fedorahosted.org/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
-%{?with_inotify:BuildRequires:	glibc-devel >= 6:2.4}
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
@@ -35,6 +35,7 @@ Requires:	/bin/run-parts
 Requires:	/sbin/chkconfig
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts
+%{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
 Provides:	crontabs = 1.7
 Provides:	group(crontab)
@@ -63,6 +64,7 @@ however this could be overloaded in settings.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %{__aclocal}
