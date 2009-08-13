@@ -1,3 +1,6 @@
+# TODO
+# - update paths in manuals (create .in files and send upstream)
+# - make /etc/pam.d independant of sysconfdir (configure-able option and send upstream)
 #
 # Conditional build:
 %bcond_without	inotify		# without inotify support
