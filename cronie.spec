@@ -1,9 +1,14 @@
 #
 # Conditional build:
-%bcond_without	selinux		# without SELinux support
 %bcond_without	inotify		# without inotify support
+%if "%{pld_release}" == "ac"
+%bcond_with		selinux		# without SELinux support
+%bcond_with		audit		# without audit support
+%else
+%bcond_without	selinux		# without SELinux support
 %bcond_without	audit		# without audit support
-#
+%endif
+
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.1
@@ -24,6 +29,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
+BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
@@ -39,12 +45,12 @@ Requires:	rc-scripts
 Provides:	crondaemon
 Provides:	crontabs = 1.7
 Provides:	group(crontab)
-%if "%{pld_release}" != "ti"
+%if "%{pld_release}" == "th"
 Provides:	vixie-cron = 4:4.4
 %endif
 Obsoletes:	crondaemon
 Obsoletes:	crontabs
-%if "%{pld_release}" != "ti"
+%if "%{pld_release}" == "th"
 Obsoletes:	vixie-cron <= 4:4.3
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -94,6 +100,7 @@ install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir}} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{cron,cron.{d,hourly,daily,weekly,monthly},pam.d}
 
 %{__make} install \
+	pamdir=/etc/pam.d \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install contrib/0anacron $RPM_BUILD_ROOT/etc/cron.hourly/0anacron
