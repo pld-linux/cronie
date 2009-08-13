@@ -1,6 +1,7 @@
 #
 # Conditional build:
 %bcond_without	selinux		# without SELinux support
+%bcond_without	inotify		# without inotify support
 #
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
@@ -17,6 +18,7 @@ Source4:	%{name}.crontab
 Source5:	%{name}.pam
 URL:		https://fedorahosted.org/cronie/
 BuildRequires:	audit-libs-devel
+%{?with_inotify:BuildRequires:	glibc-devel >= 6:2.4}
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
@@ -67,7 +69,7 @@ however this could be overloaded in settings.
 	--with-pam \
 	--with%{!?with_selinux:out}-selinux \
 	--with-audit \
-	--with-inotify \
+	--with%{!?with_inotify:out}-inotify \
 	--enable-anacron
 
 %{__make}
