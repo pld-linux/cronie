@@ -2,6 +2,7 @@
 # Conditional build:
 %bcond_without	selinux		# without SELinux support
 %bcond_without	inotify		# without inotify support
+%bcond_without	audit		# without audit support
 #
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
@@ -17,7 +18,9 @@ Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
 URL:		https://fedorahosted.org/cronie/
-BuildRequires:	audit-libs-devel
+%{?with_audit:BuildRequires:	audit-libs-devel}
+BuildRequires:	autoconf
+BuildRequires:	automake
 %{?with_inotify:BuildRequires:	glibc-devel >= 6:2.4}
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
@@ -62,13 +65,17 @@ however this could be overloaded in settings.
 %setup -q
 
 %build
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 %configure \
 	SYSCRONTAB=/etc/cron.d/crontab \
 	SYS_CROND_DIR=/etc/cron.d \
 	--sysconfdir=/etc/cron \
 	--with-pam \
 	--with%{!?with_selinux:out}-selinux \
-	--with-audit \
+	--with%{!?with_audit:out}-audit \
 	--with%{!?with_inotify:out}-inotify \
 	--enable-anacron
 
