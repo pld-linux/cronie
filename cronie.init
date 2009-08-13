@@ -9,7 +9,7 @@
 #		security and more powerful configuration options.
 #
 # processname:	crond
-# config:	/etc/crontab
+# config:	/etc/cron.d
 # pidfile:	/var/run/crond.pid
 
 
