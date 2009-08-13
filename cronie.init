@@ -21,24 +21,49 @@
 
 start() {
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/crond ]; then
-		msg_starting "cronie"
-		daemon /usr/sbin/crond
-		RETVAL=$?
-		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/crond
-	else
-		msg_already_running "cronie"
+	if [ -f /var/lock/subsys/crond ]; then
+		msg_already_running "cronie crond"
+		return
 	fi
+
+	msg_starting "cronie crond"
+	daemon /usr/sbin/crond
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/crond
 }
 
 stop() {
-	if [ -f /var/lock/subsys/crond ]; then
-		msg_stopping "cronie"
-		killproc crond
-		rm -f /var/lock/subsys/crond
-	else
-		msg_not_running "cronie"
+	if [ ! -f /var/lock/subsys/crond ]; then
+		msg_not_running "cronie crond"
+		return
 	fi
+
+	msg_stopping "cronie crond"
+	killproc crond
+	rm -f /var/lock/subsys/crond
+}
+
+reload() {
+	if [ ! -f /var/lock/subsys/crond ]; then
+		msg_not_running "cronie crond"
+		RETVAL=7
+		return
+	fi
+
+	msg_reloading "cronie crond"
+	killproc crond -HUP
+	RETVAL=$?
+}
+
+condrestart() {
+	if [ ! -f /var/lock/subsys/crond ]; then
+		msg_not_running "cronie crond"
+		RETVAL=$1
+		return
+	fi
+
+	stop
+	start
 }
 
 RETVAL=0
@@ -50,26 +75,22 @@ case "$1" in
   stop)
   	stop
 	;;
-  status)
-	status crond
-	exit $?
-	;;
   restart)
 	stop
 	start
 	;;
+  try-restart)
+	condrestart 0
+	;;
   reload|force-reload)
-	if [ -f /var/lock/subsys/crond ]; then
-		msg_reloading "cronie"
-		killproc crond -HUP
-		RETVAL=$?
-	else
-		msg_not_running "cronie"
-		exit 7
-	fi
+  	reload
+	;;
+  status)
+	status crond
+	exit $?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status}"
 	exit 3
 esac
 
