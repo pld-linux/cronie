@@ -7,7 +7,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.1
-Release:	2
+Release:	3
 License:	MIT and BSD and GPLv2
 Group:		Daemons
 Source0:	%{name}-%{version}.tar.gz
@@ -39,10 +39,14 @@ Requires:	rc-scripts
 Provides:	crondaemon
 Provides:	crontabs = 1.7
 Provides:	group(crontab)
+%if "%{pld_release}" != "ti"
 Provides:	vixie-cron = 4:4.4
+%endif
 Obsoletes:	crondaemon
 Obsoletes:	crontabs
+%if "%{pld_release}" != "ti"
 Obsoletes:	vixie-cron <= 4:4.3
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
