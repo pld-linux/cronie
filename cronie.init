@@ -82,7 +82,7 @@ case "$1" in
   try-restart)
 	condrestart 0
 	;;
-  reload|force-reload)
+  reload|force-reload|flush-logs)
   	reload
 	;;
   status)
@@ -90,7 +90,7 @@ case "$1" in
 	exit $?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|flush-logs|status}"
 	exit 3
 esac
 

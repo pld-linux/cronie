@@ -1,6 +1,6 @@
 /var/log/cron {
 	create 660 root crontab
 	postrotate
-		/bin/killall -HUP crond
+		/sbin/service crond flush-logs >/dev/null
 	endscript
 }
