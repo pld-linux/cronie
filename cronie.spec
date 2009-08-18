@@ -15,7 +15,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.1
-Release:	4
+Release:	5
 License:	MIT and BSD and GPLv2
 Group:		Daemons
 Source0:	%{name}-%{version}.tar.gz
