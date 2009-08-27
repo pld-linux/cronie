@@ -15,7 +15,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.1
-Release:	5
+Release:	6
 License:	MIT and BSD and GPLv2
 Group:		Daemons
 Source0:	%{name}-%{version}.tar.gz
@@ -85,7 +85,7 @@ however this could be overloaded in settings.
 %{__autoheader}
 %{__automake}
 %configure \
-	SYSCRONTAB=/etc/cron.d/crontab \
+	SYSCRONTAB=/etc/crontab \
 	SYS_CROND_DIR=/etc/cron.d \
 	--sysconfdir=/etc/cron \
 	--with-pam \
