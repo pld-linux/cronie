@@ -1,0 +1,36 @@
+--- cronie-1.4.1/src/cron.c~	2009-06-22 08:13:27.000000000 +0200
++++ cronie-1.4.1/src/cron.c	2009-09-09 14:58:49.613957188 +0200
+@@ -47,10 +47,10 @@
+ 
+ #if defined WITH_INOTIFY
+ 
+-# define NUM_WATCHES 3
++# define NUM_WATCHES 2
+ 
+ int wd[NUM_WATCHES];
+-const char *watchpaths[NUM_WATCHES] = {SPOOL_DIR, SYS_CROND_DIR, SYSCRONTAB};
++const char *watchpaths[NUM_WATCHES] = {SPOOL_DIR, SYS_CROND_DIR};
+ 
+ void set_cron_unwatched(int fd) {
+ 	int i;
+--- cronie-1.4.1/src/database.c~	2009-06-01 09:46:08.000000000 +0200
++++ cronie-1.4.1/src/database.c	2009-09-09 15:00:05.734341492 +0200
+@@ -202,8 +202,6 @@
+ 
+ 		/* TODO: parse the events and read only affected files */
+ 
+-		process_crontab("root", NULL, SYSCRONTAB, &new_db, old_db);
+-
+ 		if (!(dir = opendir(SYS_CROND_DIR))) {
+ 			log_it("CRON", pid, "OPENDIR FAILED", SYS_CROND_DIR, errno);
+ 		}
+@@ -340,9 +338,6 @@
+ 	new_db.ifd = old_db->ifd;
+ #endif
+ 
+-	if (syscron_stat.st_mtime)
+-		process_crontab("root", NULL, SYSCRONTAB, &new_db, old_db);
+-
+ 	if (!(dir = opendir(SYS_CROND_DIR))) {
+ 		log_it("CRON", pid, "OPENDIR FAILED", SYS_CROND_DIR, errno);
+ 	}

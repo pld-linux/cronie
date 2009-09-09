@@ -15,7 +15,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.1
-Release:	6
+Release:	7
 License:	MIT and BSD and GPLv2
 Group:		Daemons
 Source0:	%{name}-%{version}.tar.gz
@@ -26,6 +26,7 @@ Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
 Patch0:		inotify-nosys.patch
+Patch1:		%{name}-nosyscrontab.patch
 URL:		https://fedorahosted.org/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
 BuildRequires:	autoconf
@@ -78,6 +79,7 @@ however this could be overloaded in settings.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__aclocal}
