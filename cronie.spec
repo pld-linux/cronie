@@ -1,6 +1,9 @@
 # TODO
 # - update paths in manuals (create .in files and send upstream)
 # - make /etc/pam.d independant of sysconfdir (configure-able option and send upstream)
+# - https://fedorahosted.org/cronie/changeset/272c4a5c417bfa6e04148fc35a4fe4c6956b17e1
+#   should we follow it too? our pam contains cron.{allow,deny} listfile rules,
+#   cronie itself checks these files so safe to drop?
 #
 # Conditional build:
 %bcond_without	inotify		# without inotify support
