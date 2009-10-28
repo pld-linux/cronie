@@ -14,12 +14,12 @@
 
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
-Version:	1.4.1
-Release:	7
-License:	MIT and BSD and GPLv2
+Version:	1.4.2
+Release:	1
+License:	MIT and BSD and GPL v2
 Group:		Daemons
-Source0:	%{name}-%{version}.tar.gz
-# Source0-md5:	9c089d2035b9fa8263bc71da3eb31cdd
+Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
+# Source0-md5:	9c7cef09ff9c92a90a314a1e947fae5c
 Source1:	%{name}.init
 Source2:	cron.logrotate
 Source3:	cron.sysconfig
@@ -108,27 +108,12 @@ install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir}} \
 	pamdir=/etc/pam.d \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install contrib/0anacron $RPM_BUILD_ROOT/etc/cron.hourly/0anacron
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/crond
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/cron
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
-install %{SOURCE5} $RPM_BUILD_ROOT/etc/pam.d/crond
-
-for a in fi fr id ja ko pl; do
-	if test -f $a/man1/crontab.1; then
-		install -d $RPM_BUILD_ROOT%{_mandir}/$a/man1
-		install $a/man1/crontab.1 $RPM_BUILD_ROOT%{_mandir}/$a/man1
-	fi
-	if test -f $a/man5/crontab.5; then
-		install -d $RPM_BUILD_ROOT%{_mandir}/$a/man5
-		install $a/man5/crontab.5 $RPM_BUILD_ROOT%{_mandir}/$a/man5
-	fi
-	if test -f $a/man8/cron.8; then
-		install -d $RPM_BUILD_ROOT%{_mandir}/$a/man8
-		install $a/man8/cron.8 $RPM_BUILD_ROOT%{_mandir}/$a/man8
-	fi
-done
+install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/crond
+cp -a contrib/0anacron $RPM_BUILD_ROOT/etc/cron.hourly/0anacron
+cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/cron
+cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
+cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
+cp -a %{SOURCE5} $RPM_BUILD_ROOT/etc/pam.d/crond
 
 touch $RPM_BUILD_ROOT/var/log/cron
 
@@ -150,11 +135,13 @@ rm -rf $RPM_BUILD_ROOT
 %groupadd -g 117 -r -f crontab
 
 %post
+if [ ! -f /var/log/cron ]; then
+	umask 027
+	touch /var/log/cron
+	chgrp crontab /var/log/cron
+	chmod 660 /var/log/cron
+fi
 /sbin/chkconfig --add crond
-umask 027
-touch /var/log/cron
-chgrp crontab /var/log/cron
-chmod 660 /var/log/cron
 %service crond restart "Cron Daemon"
 
 %preun
