@@ -1,0 +1,2 @@
+- rel 6; leave syscrontab as /etc/crontab. /etc/cron.d/crontab will be still
+  processed by cron.d/ dir rule and we don't want for it to be processed twice.
