@@ -41,14 +41,13 @@ BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
-Requires(post,preun):	rc-scripts
 Requires(postun):	/usr/sbin/groupdel
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires:	/bin/run-parts
 Requires:	/sbin/chkconfig
 Requires:	psmisc >= 20.1
-Requires:	rc-scripts
+Requires:	rc-scripts >= 0.4.0.19
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
 Provides:	crontabs = 1.7
