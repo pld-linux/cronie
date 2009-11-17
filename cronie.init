@@ -86,7 +86,7 @@ case "$1" in
   	reload
 	;;
   status)
-	status crond
+	status --pidfile /var/run/crond.pid crond
 	exit $?
 	;;
   *)
