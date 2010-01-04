@@ -1,9 +1,6 @@
 # TODO
 # - update paths in manuals (create .in files and send upstream)
 # - make /etc/pam.d independant of sysconfdir (configure-able option and send upstream)
-# - https://fedorahosted.org/cronie/changeset/272c4a5c417bfa6e04148fc35a4fe4c6956b17e1
-#   should we follow it too? our pam contains cron.{allow,deny} listfile rules,
-#   cronie itself checks these files so safe to drop?
 #
 # Conditional build:
 %bcond_without	inotify		# without inotify support
@@ -18,7 +15,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.3
-Release:	1
+Release:	2
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -159,18 +156,15 @@ if [ "$1" = "0" ]; then
 	%groupremove crontab
 fi
 
-%triggerpostun -- hc-cron
-# reinstall crond init.d links, which could be different
-/sbin/chkconfig --del crond
-/sbin/chkconfig --add crond
-
-%triggerun -- vixie-cron
+%triggerun -- hc-cron,fcron,vixie-cron
 # Prevent preun from crond from working
 chmod a-x /etc/rc.d/init.d/crond
 
-%triggerpostun -- vixie-cron
+%triggerpostun -- hc-cron,fcron,vixie-cron
 # Restore what triggerun removed
 chmod 754 /etc/rc.d/init.d/crond
+# reinstall crond init.d links, which could be different
+/sbin/chkconfig --del crond
 /sbin/chkconfig --add crond
 
 %files
