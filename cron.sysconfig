@@ -1,4 +1,19 @@
-# Customized settings for cron
+# Customized settings for cronie crond
 
-# Define nice level for cron
+# Define nice level for crond
 SERVICE_RUN_NICE_LEVEL="+0"
+
+# This option will direct cron to send job output to the system log using syslog(3).
+# This is useful if your system has no sendmail(8), or if mail is disabled using "off".
+#CROND_SYSLOG_RESULT="yes"
+
+# This option allows you to specify a shell command string to use
+# for sending cron mail output instead of sendmail(8).
+# This command must accept a fully formatted mail message (with headers) on
+# stdin and send it as a mail message to the recipients specified in the mail
+# headers.
+# As a special case, the string "off" will disable sending mail.
+#CROND_MAIL_PROG="sendmail"
+
+# Extra arguments to crond(8)
+#CROND_ARGS=""

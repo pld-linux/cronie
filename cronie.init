@@ -16,6 +16,8 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+CROND_ARGS=""
+
 # Get service config
 [ -f /etc/sysconfig/cron ] && . /etc/sysconfig/cron
 
@@ -26,8 +28,17 @@ start() {
 		return
 	fi
 
+	if is_yes "$CROND_SYSLOG_RESULT"; then
+		CROND_ARGS="$CROND_ARGS -s"
+	fi
+
+	if [ -n "$CROND_MAIL_PROG" ]; then
+		# XXX: should we handle spaces in $CROND_MAIL_PROG?
+		CROND_ARGS="$CROND_ARGS -m $CROND_MAIL_PROG"
+	fi
+
 	msg_starting "cronie crond"
-	daemon /usr/sbin/crond
+	daemon /usr/sbin/crond $CROND_ARGS
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/crond
 }
