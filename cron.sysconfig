@@ -13,7 +13,7 @@ SERVICE_RUN_NICE_LEVEL="+0"
 # stdin and send it as a mail message to the recipients specified in the mail
 # headers.
 # As a special case, the string "off" will disable sending mail.
-#CROND_MAIL_PROG="sendmail"
+#CROND_MAIL_PROG="/usr/lib/sendmail"
 
 # Extra arguments to crond(8)
 #CROND_ARGS=""
