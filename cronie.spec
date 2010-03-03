@@ -1,6 +1,8 @@
 # TODO
 # - update paths in manuals (create .in files and send upstream)
 # - make /etc/pam.d independant of sysconfdir (configure-able option and send upstream)
+# - syslog output (-s) writes two bytes of garbage to syslog instead of actual data:
+#   Mar  3 09:30:01 ravenous CROND[2528]: 4ÿ
 #
 # Conditional build:
 %bcond_without	inotify		# without inotify support
