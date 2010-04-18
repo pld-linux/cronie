@@ -139,10 +139,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 if [ ! -f /var/log/cron ]; then
-	umask 027
-	touch /var/log/cron
-	chgrp crontab /var/log/cron
-	chmod 660 /var/log/cron
+	install -m 660 -g crontab /dev/null /var/log/cron
 fi
 /sbin/chkconfig --add crond
 %service crond restart "Cron Daemon"
