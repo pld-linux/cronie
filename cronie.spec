@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.4
-Release:	4
+Release:	5
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -27,6 +27,7 @@ Source2:	cron.logrotate
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
+Source6:	%{name}.upstart
 Patch0:		inotify-nosys.patch
 Patch1:		%{name}-nosyscrontab.patch
 Patch2:		sendmail-path.patch
@@ -37,7 +38,7 @@ BuildRequires:	automake
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
 BuildRequires:	rpm >= 4.4.9-56
-BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	rpmbuild(macros) >= 1.561
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
@@ -46,7 +47,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires:	/bin/run-parts
 Requires:	/sbin/chkconfig
 Requires:	psmisc >= 20.1
-Requires:	rc-scripts >= 0.4.0.19
+Requires:	rc-scripts >= 0.4.3.0
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
 Provides:	crontabs = 1.7
@@ -78,6 +79,19 @@ Anacron becames part of cronie. Anacron is used only for running
 regular jobs. The default settings execute regular jobs by anacron,
 however this could be overloaded in settings.
 
+%package upstart
+Summary:	Upstart job description for Cronie
+Summary(pl.UTF-8):	Opis zadania Upstart dla Cronie
+Group:		Daemons
+Requires:	%{name} = %{version}-%{release}
+Requires:	upstart >= 0.6
+
+%description upstart
+Upstart job description for Cronie.
+
+%description upstart -l pl.UTF-8
+Opis zadania Upstart dla Cronie.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -104,7 +118,7 @@ however this could be overloaded in settings.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir}} \
-	$RPM_BUILD_ROOT/etc/{rc.d/init.d,logrotate.d,sysconfig} \
+	$RPM_BUILD_ROOT/etc/{rc.d/init.d,logrotate.d,sysconfig,init} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{cron,cron.{d,hourly,daily,weekly,monthly},pam.d}
 
 %{__make} install \
@@ -117,6 +131,7 @@ cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/cron
 cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
 cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
 cp -a %{SOURCE5} $RPM_BUILD_ROOT/etc/pam.d/crond
+cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/crond.conf
 
 touch $RPM_BUILD_ROOT/var/log/cron
 
@@ -166,6 +181,12 @@ chmod 754 /etc/rc.d/init.d/crond
 /sbin/chkconfig --del crond
 /sbin/chkconfig --add crond
 
+%post upstart
+%upstart_post crond
+
+%postun upstart
+%upstart_postun crond
+
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README
@@ -196,3 +217,7 @@ chmod 754 /etc/rc.d/init.d/crond
 %{_mandir}/man8/anacron.8*
 
 %attr(1730,root,crontab) /var/spool/anacron
+
+%files upstart
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) /etc/init/crond.conf
