@@ -1,5 +1,8 @@
 description "Cronie - the cron daemon"
 
+start on pld.sysinit-done
+stop on pld.shutdown-started
+
 # This option will direct cron to send job output to the system log using syslog(3).
 # This is useful if your system has no sendmail(8), or if mail is disabled using "off".
 env CROND_SYSLOG_RESULT="no"
