@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.6
-Release:	2
+Release:	3
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -225,6 +225,8 @@ chmod 754 /etc/rc.d/init.d/crond
 
 %attr(1730,root,crontab) /var/spool/anacron
 
+%if "%{pld_release}" != "ti"
 %files upstart
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/init/crond.conf
+%endif
