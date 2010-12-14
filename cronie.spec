@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.6
-Release:	3
+Release:	4
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -168,13 +168,6 @@ fi
 %postun
 if [ "$1" = "0" ]; then
 	%groupremove crontab
-fi
-
-%triggerin -- pam
-# restart crond if pam is upgraded
-# (crond is linked with old libpam but tries to open modules linked with new libpam)
-if [ "$2" != 1 ]; then
-	%service -q crond restart
 fi
 
 %triggerun -- hc-cron,fcron,vixie-cron
