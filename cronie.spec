@@ -16,12 +16,12 @@
 
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
-Version:	1.4.7
+Version:	1.4.8
 Release:	1
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
-# Source0-md5:	dfc26c47756d0c40ee27ae3c7ee98e0d
+# Source0-md5:	9b1d2ce6db8d1883e06635f437170657
 Source1:	%{name}.init
 Source2:	cron.logrotate
 Source3:	cron.sysconfig
