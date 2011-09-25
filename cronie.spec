@@ -45,7 +45,6 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires:	/bin/run-parts
-Requires:	/sbin/chkconfig
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
