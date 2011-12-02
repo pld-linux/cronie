@@ -1,0 +1,11 @@
+[Unit]
+Description=Command Scheduler
+After=syslog.target auditd.service sssd.service ypbind.service
+
+[Service]
+EnvironmentFile=/etc/sysconfig/cron
+ExecStart=/usr/sbin/crond -n $CROND_ARGS
+
+[Install]
+WantedBy=multi-user.target
+

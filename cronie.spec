@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	3
+Release:	4
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -28,6 +28,7 @@ Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
 Source6:	%{name}.upstart
+Source7:	crond.service
 Patch0:		inotify-nosys.patch
 Patch1:		%{name}-nosyscrontab.patch
 Patch2:		sendmail-path.patch
@@ -91,6 +92,14 @@ Upstart job description for Cronie.
 %description upstart -l pl.UTF-8
 Opis zadania Upstart dla Cronie.
 
+%package systemd
+Summary:	systemd units for cronie
+Group:		Base
+Requires:	%{name} = %{version}-%{release}
+
+%description systemd
+systemd units for cronie.
+
 %prep
 %setup -q
 %patch0 -p1
@@ -118,7 +127,7 @@ Opis zadania Upstart dla Cronie.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir}} \
+install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir},/lib/systemd/system}\
 	$RPM_BUILD_ROOT/etc/{rc.d/init.d,logrotate.d,sysconfig,init} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{cron,cron.{d,hourly,daily,weekly,monthly},pam.d}
 
@@ -133,6 +142,7 @@ cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
 cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
 cp -a %{SOURCE5} $RPM_BUILD_ROOT/etc/pam.d/crond
 cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/crond.conf
+cp -a %{SOURCE7} $RPM_BUILD_ROOT/lib/systemd/system/crond.service
 
 touch $RPM_BUILD_ROOT/var/log/cron
 
@@ -224,3 +234,7 @@ chmod 754 /etc/rc.d/init.d/crond
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/init/crond.conf
 %endif
+
+%files systemd
+%defattr(644,root,root,755)
+/lib/systemd/system/crond.service
