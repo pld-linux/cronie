@@ -205,10 +205,10 @@ chmod 754 /etc/rc.d/init.d/crond
 %systemd_enable cronie.service
 
 %preun systemd
-%systemd_preun cornie.service
+%systemd_preun cronie.service
 
 %postun systemd
-%systemd_postun cornie.service
+%systemd_postun cronie.service
 
 %files
 %defattr(644,root,root,755)
