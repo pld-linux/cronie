@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	6
+Release:	7
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -39,7 +39,7 @@ BuildRequires:	automake
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
 BuildRequires:	rpm >= 4.4.9-56
-BuildRequires:	rpmbuild(macros) >= 1.623
+BuildRequires:	rpmbuild(macros) >= 1.625
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
@@ -96,7 +96,7 @@ Opis zadania Upstart dla Cronie.
 Summary:	systemd units for cronie
 Group:		Base
 Requires:	%{name} = %{version}-%{release}
-Requires:	systemd-units
+Requires:	systemd-units >= 37-0.10
 
 %description systemd
 systemd units for cronie.
