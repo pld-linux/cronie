@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	4
+Release:	5
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -39,7 +39,7 @@ BuildRequires:	automake
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
 BuildRequires:	rpm >= 4.4.9-56
-BuildRequires:	rpmbuild(macros) >= 1.561
+BuildRequires:	rpmbuild(macros) >= 1.623
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
@@ -96,6 +96,7 @@ Opis zadania Upstart dla Cronie.
 Summary:	systemd units for cronie
 Group:		Base
 Requires:	%{name} = %{version}-%{release}
+Requires:	systemd-units
 
 %description systemd
 systemd units for cronie.
@@ -142,7 +143,8 @@ cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
 cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
 cp -a %{SOURCE5} $RPM_BUILD_ROOT/etc/pam.d/crond
 cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/crond.conf
-cp -a %{SOURCE7} $RPM_BUILD_ROOT/lib/systemd/system/crond.service
+cp -a %{SOURCE7} $RPM_BUILD_ROOT%{systemdunitdir}/cronie.service
+ln -s cronie.service $RPM_BUILD_ROOT%{systemdunitdir}/crond.service
 
 touch $RPM_BUILD_ROOT/var/log/cron
 
@@ -198,6 +200,16 @@ chmod 754 /etc/rc.d/init.d/crond
 %postun upstart
 %upstart_postun crond
 
+%post systemd
+%systemd_post
+%systemd_enable cronie.service
+
+%preun systemd
+%systemd_preun cornie.service
+
+%postun systemd
+%systemd_postun cornie.service
+
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README
@@ -237,4 +249,5 @@ chmod 754 /etc/rc.d/init.d/crond
 
 %files systemd
 %defattr(644,root,root,755)
-/lib/systemd/system/crond.service
+%{systemdunitdir}/crond.service
+%{systemdunitdir}/cronie.service
