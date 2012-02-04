@@ -128,7 +128,7 @@ systemd units for cronie.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir},/lib/systemd/system}\
+install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir},%{systemdunitdir}}\
 	$RPM_BUILD_ROOT/etc/{rc.d/init.d,logrotate.d,sysconfig,init} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{cron,cron.{d,hourly,daily,weekly,monthly},pam.d}
 
