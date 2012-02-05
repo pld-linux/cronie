@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	8
+Release:	9
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -48,6 +48,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires:	/bin/run-parts
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
+Requires:	systemd-units >= 37-0.10
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
 Provides:	crontabs = 1.7
@@ -91,15 +92,6 @@ Upstart job description for Cronie.
 
 %description upstart -l pl.UTF-8
 Opis zadania Upstart dla Cronie.
-
-%package systemd
-Summary:	systemd units for cronie
-Group:		Base
-Requires:	%{name} = %{version}-%{release}
-Requires:	systemd-units >= 37-0.10
-
-%description systemd
-systemd units for cronie.
 
 %prep
 %setup -q
@@ -171,17 +163,23 @@ if [ ! -f /var/log/cron ]; then
 fi
 /sbin/chkconfig --add crond
 %service crond restart "Cron Daemon"
+%systemd_post cronie.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service crond stop
 	/sbin/chkconfig --del crond
 fi
+%systemd_preun cronie.service
 
 %postun
 if [ "$1" = "0" ]; then
 	%groupremove crontab
 fi
+%systemd_reload
+
+%triggerpostun -- cronie < 1.4.8-9
+%systemd_trigger cronie.service
 
 %triggerun -- hc-cron,fcron,vixie-cron
 # Prevent preun from crond from working
@@ -200,15 +198,6 @@ chmod 754 /etc/rc.d/init.d/crond
 %postun upstart
 %upstart_postun crond
 
-%post systemd
-%systemd_post cronie.service
-
-%preun systemd
-%systemd_preun cronie.service
-
-%postun systemd
-%systemd_reload
-
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README
@@ -220,6 +209,8 @@ chmod 754 /etc/rc.d/init.d/crond
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/crond
 %attr(754,root,root) /etc/rc.d/init.d/crond
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/cron
+%{systemdunitdir}/crond.service
+%{systemdunitdir}/cronie.service
 %attr(755,root,root) %{_sbindir}/crond
 %attr(2755,root,crontab) %{_bindir}/crontab
 
@@ -245,8 +236,3 @@ chmod 754 /etc/rc.d/init.d/crond
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/init/crond.conf
 %endif
-
-%files systemd
-%defattr(644,root,root,755)
-%{systemdunitdir}/crond.service
-%{systemdunitdir}/cronie.service
