@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	9
+Release:	10
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -57,6 +57,7 @@ Provides:	group(crontab)
 Provides:	vixie-cron = 4.3-1
 %endif
 Obsoletes:	crondaemon
+Obsoletes:	cronie-systemd
 Obsoletes:	crontabs
 %if "%{pld_release}" == "th"
 Obsoletes:	vixie-cron < 4.3-1
