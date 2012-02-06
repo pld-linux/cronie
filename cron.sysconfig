@@ -5,7 +5,7 @@ SERVICE_RUN_NICE_LEVEL="+0"
 
 # This option will direct cron to send job output to the system log using syslog(3).
 # This is useful if your system has no sendmail(8), or if mail is disabled using "off".
-#CROND_SYSLOG_RESULT="yes"
+#CROND_ARGS="-s"
 
 # This option allows you to specify a shell command string to use
 # for sending cron mail output instead of sendmail(8).
@@ -13,7 +13,7 @@ SERVICE_RUN_NICE_LEVEL="+0"
 # stdin and send it as a mail message to the recipients specified in the mail
 # headers.
 # As a special case, the string "off" will disable sending mail.
-#CROND_MAIL_PROG="/usr/lib/sendmail"
+#CROND_ARGS="-m /usr/lib/sendmail"
 
 # Extra arguments to crond(8)
 #CROND_ARGS=""
