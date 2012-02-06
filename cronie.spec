@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	10
+Release:	11
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -179,7 +179,18 @@ if [ "$1" = "0" ]; then
 fi
 %systemd_reload
 
-%triggerpostun -- cronie < 1.4.8-9
+%triggerpostun -- cronie < 1.4.8-11
+if [ -f /etc/sysconfig/cron ]; then
+	. /etc/sysconfig/cron
+	__CROND_ARGS=
+	[ "$CROND_SYSLOG_RESULT" = "yes" ] && __CROND_ARGS="-s"
+	[ -n "$CROND_MAIL_PROG" ] && __CROND_ARGS="$__CROND_ARGS -m $CROND_MAIL_PROG"
+	[ -z "$__CROND_ARGS" ] && exit 0
+	cp -f /etc/sysconfig/cron{,.rpmsave}
+	echo >>/etc/sysconfig/cron
+	echo "# Added by rpm trigger" >>/etc/sysconfig/cron
+	echo "CROND_ARGS=\"$CROND_ARGS $__CROND_ARGS\"" >>/etc/sysconfig/cron
+fi
 %systemd_trigger cronie.service
 
 %triggerun -- hc-cron,fcron,vixie-cron
