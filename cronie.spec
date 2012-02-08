@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	13
+Release:	14
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -136,8 +136,7 @@ cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
 cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
 cp -a %{SOURCE5} $RPM_BUILD_ROOT/etc/pam.d/crond
 cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/crond.conf
-cp -a %{SOURCE7} $RPM_BUILD_ROOT%{systemdunitdir}/cronie.service
-ln -s cronie.service $RPM_BUILD_ROOT%{systemdunitdir}/crond.service
+cp -a %{SOURCE7} $RPM_BUILD_ROOT%{systemdunitdir}/crond.service
 
 touch $RPM_BUILD_ROOT/var/log/cron
 
@@ -164,14 +163,14 @@ if [ ! -f /var/log/cron ]; then
 fi
 /sbin/chkconfig --add crond
 %service crond restart "Cron Daemon"
-%systemd_post cronie.service
+%systemd_post crond.service
 
 %preun
 if [ "$1" = "0" ]; then
 	%service crond stop
 	/sbin/chkconfig --del crond
 fi
-%systemd_preun cronie.service
+%systemd_preun crond.service
 
 %postun
 if [ "$1" = "0" ]; then
@@ -192,7 +191,7 @@ if [ -f /etc/sysconfig/cron ]; then
 		echo "CROND_ARGS=\"$CROND_ARGS $__CROND_ARGS\"" >>/etc/sysconfig/cron
 	fi
 fi
-%systemd_trigger cronie.service
+%systemd_trigger crond.service
 
 %triggerun -- hc-cron,fcron,vixie-cron
 # Prevent preun from crond from working
@@ -223,7 +222,6 @@ chmod 754 /etc/rc.d/init.d/crond
 %attr(754,root,root) /etc/rc.d/init.d/crond
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/cron
 %{systemdunitdir}/crond.service
-%{systemdunitdir}/cronie.service
 %attr(755,root,root) %{_sbindir}/crond
 %attr(2755,root,crontab) %{_bindir}/crontab
 
