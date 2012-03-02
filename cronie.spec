@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	15
+Release:	16
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -32,6 +32,7 @@ Source7:	crond.service
 Patch0:		inotify-nosys.patch
 Patch1:		%{name}-nosyscrontab.patch
 Patch2:		sendmail-path.patch
+Patch3:		cronie-1.4.8-inotify-fix.patch
 URL:		https://fedorahosted.org/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
 BuildRequires:	autoconf
@@ -99,6 +100,7 @@ Opis zadania Upstart dla Cronie.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %{__aclocal}
