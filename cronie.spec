@@ -115,7 +115,9 @@ Opis zadania Upstart dla Cronie.
 	--with%{!?with_selinux:out}-selinux \
 	--with%{!?with_audit:out}-audit \
 	--with%{!?with_inotify:out}-inotify \
+%if "%{cc_version}" >= "3.4"
 	--enable-pie \
+%endif
 	--enable-relro \
 	--enable-anacron
 
