@@ -7,11 +7,13 @@
 # Conditional build:
 %bcond_without	inotify		# without inotify support
 %if "%{pld_release}" == "ac"
-%bcond_with		selinux		# without SELinux support
-%bcond_with		audit		# without audit support
+%bcond_with		selinux		# with SELinux support
+%bcond_with		audit		# with audit support
+%bcond_with		systemd		# with systemd units
 %else
 %bcond_without	selinux		# without SELinux support
 %bcond_without	audit		# without audit support
+%bcond_with		systemd		# without systemd units
 %endif
 
 Summary:	Cron daemon for executing programs at set times
@@ -49,7 +51,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires:	/bin/run-parts
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
-Requires:	systemd-units >= 37-0.10
+%{?with_systemd:Requires:	systemd-units >= 37-0.10}
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
 Provides:	crontabs = 1.7
@@ -225,7 +227,7 @@ chmod 754 /etc/rc.d/init.d/crond
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/crond
 %attr(754,root,root) /etc/rc.d/init.d/crond
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/cron
-%{systemdunitdir}/crond.service
+%{?with_systemd:%{systemdunitdir}/crond.service}
 %attr(755,root,root) %{_sbindir}/crond
 %attr(2755,root,crontab) %{_bindir}/crontab
 
@@ -246,7 +248,7 @@ chmod 754 /etc/rc.d/init.d/crond
 
 %attr(1730,root,crontab) /var/spool/anacron
 
-%if "%{pld_release}" != "ti"
+%if "%{pld_release}" == "th"
 %files upstart
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/init/crond.conf
