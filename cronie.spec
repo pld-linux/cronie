@@ -16,10 +16,17 @@
 %bcond_with		systemd		# without systemd units
 %endif
 
+%if %{without systemd}
+%define	systemd_post() %{nil}
+%define	systemd_preun() %{nil}
+%define	systemd_reload() %{nil}
+%define	systemd_trigger() %{nil}
+%endif
+
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	16
+Release:	17
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
