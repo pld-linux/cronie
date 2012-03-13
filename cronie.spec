@@ -9,24 +9,15 @@
 %if "%{pld_release}" == "ac"
 %bcond_with		selinux		# with SELinux support
 %bcond_with		audit		# with audit support
-%bcond_with		systemd		# with systemd units
 %else
 %bcond_without	selinux		# without SELinux support
 %bcond_without	audit		# without audit support
-%bcond_with		systemd		# without systemd units
-%endif
-
-%if %{without systemd}
-%define	systemd_post() %{nil}
-%define	systemd_preun() %{nil}
-%define	systemd_reload() %{nil}
-%define	systemd_trigger() %{nil}
 %endif
 
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	17
+Release:	18
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -49,7 +40,7 @@ BuildRequires:	automake
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
 BuildRequires:	rpm >= 4.4.9-56
-BuildRequires:	rpmbuild(macros) >= 1.626
+BuildRequires:	rpmbuild(macros) >= 1.647
 Requires(post):	fileutils
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
@@ -58,7 +49,9 @@ Requires(pre):	/usr/sbin/groupadd
 Requires:	/bin/run-parts
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
-%{?with_systemd:Requires:	systemd-units >= 37-0.10}
+%if %{pld_release} != "ac"
+Requires:	systemd-units >= 37-0.10}
+%endif
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
 Provides:	crontabs = 1.7
@@ -234,7 +227,7 @@ chmod 754 /etc/rc.d/init.d/crond
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/crond
 %attr(754,root,root) /etc/rc.d/init.d/crond
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/cron
-%{?with_systemd:%{systemdunitdir}/crond.service}
+%{systemdunitdir}/crond.service
 %attr(755,root,root) %{_sbindir}/crond
 %attr(2755,root,crontab) %{_bindir}/crontab
 
