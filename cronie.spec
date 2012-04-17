@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.8
-Release:	18
+Release:	19
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -50,7 +50,8 @@ Requires:	/bin/run-parts
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
 %if %{pld_release} != "ac"
-Requires:	systemd-units >= 37-0.10}
+Requires(post,preun,postun):	systemd-units >= 38
+Requires:	systemd-units >= 38}
 %endif
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
