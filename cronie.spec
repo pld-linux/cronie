@@ -200,11 +200,11 @@ if [ -f /etc/sysconfig/cron ]; then
 fi
 %systemd_trigger crond.service
 
-%triggerun -- hc-cron,fcron,vixie-cron
+%triggerun -- hc-cron,fcron,vixie-cron < 4.3-1
 # Prevent preun from crond from working
 chmod a-x /etc/rc.d/init.d/crond
 
-%triggerpostun -- hc-cron,fcron,vixie-cron
+%triggerpostun -- hc-cron,fcron,vixie-cron < 4.3-1
 # Restore what triggerun removed
 chmod 754 /etc/rc.d/init.d/crond
 # reinstall crond init.d links, which could be different
