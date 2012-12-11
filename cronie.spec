@@ -16,12 +16,12 @@
 
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
-Version:	1.4.8
-Release:	20
+Version:	1.4.9
+Release:	1
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
-# Source0-md5:	9b1d2ce6db8d1883e06635f437170657
+# Source0-md5:	9133195e5e6f824ef460f5ccc533f1b7
 Source1:	%{name}.init
 Source2:	cron.logrotate
 Source3:	cron.sysconfig
@@ -30,9 +30,7 @@ Source5:	%{name}.pam
 Source6:	%{name}.upstart
 Source7:	crond.service
 Patch0:		inotify-nosys.patch
-Patch1:		%{name}-nosyscrontab.patch
-Patch2:		sendmail-path.patch
-Patch3:		cronie-1.4.8-inotify-fix.patch
+Patch1:		sendmail-path.patch
 URL:		https://fedorahosted.org/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
 BuildRequires:	autoconf
@@ -49,7 +47,7 @@ Requires(pre):	/usr/sbin/groupadd
 Requires:	/bin/run-parts
 Requires:	psmisc >= 20.1
 Requires:	rc-scripts >= 0.4.3.0
-%if %{pld_release} != "ac"
+%if "%{pld_release}" != "ac"
 Requires(post,preun,postun):	systemd-units >= 38
 Requires:	systemd-units >= 38}
 %endif
@@ -102,8 +100,6 @@ Opis zadania Upstart dla Cronie.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %build
 %{__aclocal}
@@ -118,6 +114,7 @@ Opis zadania Upstart dla Cronie.
 	--with%{!?with_selinux:out}-selinux \
 	--with%{!?with_audit:out}-audit \
 	--with%{!?with_inotify:out}-inotify \
+	--without-syscrontab \
 %if "%{cc_version}" >= "3.4"
 	--enable-pie \
 %endif
