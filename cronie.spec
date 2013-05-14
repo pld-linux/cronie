@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.9
-Release:	1
+Release:	2
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -133,12 +133,19 @@ install -d $RPM_BUILD_ROOT{/var/{log,spool/{ana,}cron},%{_mandir},%{systemdunitd
 	pamdir=/etc/pam.d \
 	DESTDIR=$RPM_BUILD_ROOT
 
+cp -p %{SOURCE5} crond.pam
+
+%if %{without audit}
+# remove recording user's login uid to the process attribute
+%{__sed} -i -e '/pam_loginuid.so/d' crond.pam
+%endif
+
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/crond
 cp -a contrib/0anacron $RPM_BUILD_ROOT/etc/cron.hourly/0anacron
 cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/cron
 cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
 cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
-cp -a %{SOURCE5} $RPM_BUILD_ROOT/etc/pam.d/crond
+cp -a crond.pam  $RPM_BUILD_ROOT/etc/pam.d/crond
 cp -a %{SOURCE6} $RPM_BUILD_ROOT/etc/init/crond.conf
 cp -a %{SOURCE7} $RPM_BUILD_ROOT%{systemdunitdir}/crond.service
 
