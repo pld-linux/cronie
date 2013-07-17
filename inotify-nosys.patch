@@ -1,17 +1,17 @@
---- cronie-1.4.1/src/cron.h~	2009-06-01 10:46:08.000000000 +0300
-+++ cronie-1.4.1/src/cron.h	2009-08-13 13:32:40.909067818 +0300
-@@ -40,7 +40,11 @@
- #endif
+--- cronie-1.4.1/src/cron.c~	2009-06-01 10:46:08.000000000 +0300
++++ cronie-1.4.1/src/cron.c	2009-08-13 13:32:40.909067818 +0300
+@@ -41,7 +41,11 @@
+ #include <unistd.h>
  
  #ifdef WITH_INOTIFY
 +#ifdef SYS_INOTIFY_H_EXISTS_AND_WORKS
- #include <sys/inotify.h>
+ # include <sys/inotify.h>
 +#else
 +#include "inotify-nosys.h"
 +#endif
  #endif
  
- #include "pathnames.h"
+ #ifdef HAVE_SYS_FCNTL_H
 --- cronie-1.4.1/configure.ac~	2009-08-13 13:56:08.000000000 +0300
 +++ cronie-1.4.1/configure.ac	2009-08-13 13:56:11.295316050 +0300
 @@ -27,7 +27,6 @@
