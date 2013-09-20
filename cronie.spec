@@ -110,6 +110,7 @@ Opis zadania Upstart dla Cronie.
 	SYSCRONTAB=/etc/crontab \
 	SYS_CROND_DIR=/etc/cron.d \
 	--sysconfdir=/etc/cron \
+	--with-editor=/bin/vi \
 	--with-pam \
 	--with%{!?with_selinux:out}-selinux \
 	--with%{!?with_audit:out}-audit \
