@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.11
-Release:	2
+Release:	3
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -115,7 +115,7 @@ Opis zadania Upstart dla Cronie.
 	--with%{!?with_selinux:out}-selinux \
 	--with%{!?with_audit:out}-audit \
 	--with%{!?with_inotify:out}-inotify \
-	--without-syscrontab \
+	--disable-syscrontab \
 %if "%{cc_version}" >= "3.4"
 	--enable-pie \
 %endif
