@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.12
-Release:	1
+Release:	2
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -143,6 +143,7 @@ cp -p %{SOURCE5} crond.pam
 
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/crond
 cp -a contrib/0anacron $RPM_BUILD_ROOT/etc/cron.hourly/0anacron
+cp -a contrib/anacrontab $RPM_BUILD_ROOT/etc/cron/anacrontab
 cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/cron
 cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
 cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
@@ -249,6 +250,7 @@ chmod 754 /etc/rc.d/init.d/crond
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_sbindir}/anacron
 %attr(755,root,root) %{_sysconfdir}/cron.hourly/0anacron
+%attr(640,root,crontab) %config(noreplace,missingok) %verify(not md5 mtime size) /etc/cron/anacrontab
 %{_mandir}/man5/anacrontab.5*
 %{_mandir}/man8/anacron.8*
 
