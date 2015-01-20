@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.4.12
-Release:	2
+Release:	3
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -226,7 +226,11 @@ chmod 754 /etc/rc.d/init.d/crond
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog README
-%attr(750,root,crontab) %dir %{_sysconfdir}/cron*
+%attr(750,root,crontab) %dir /etc/cron
+%attr(750,root,crontab) %dir /etc/cron.daily
+%attr(750,root,crontab) %dir /etc/cron.hourly
+%attr(750,root,crontab) %dir /etc/cron.monthly
+%attr(750,root,crontab) %dir /etc/cron.weekly
 %attr(640,root,crontab) %config(noreplace,missingok) /etc/cron.d/crontab
 %attr(640,root,crontab) %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/cron/cron.allow
 %attr(640,root,crontab) %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/cron/cron.deny
