@@ -1,6 +1,0 @@
-/var/log/cron {
-	create 660 root crontab
-	postrotate
-		/sbin/service crond reload >/dev/null
-	endscript
-}

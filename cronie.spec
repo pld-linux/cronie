@@ -17,13 +17,12 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.5.0
-Release:	1
+Release:	2
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
 # Source0-md5:	9db75e1884d83a45e002d145c6c54d45
 Source1:	%{name}.init
-Source2:	cron.logrotate
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
 Source5:	%{name}.pam
@@ -130,13 +129,10 @@ cp -p %{SOURCE5} crond.pam
 install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/crond
 cp -a contrib/0anacron $RPM_BUILD_ROOT/etc/cron.hourly/0anacron
 cp -a contrib/anacrontab $RPM_BUILD_ROOT/etc/cron/anacrontab
-cp -a %{SOURCE2} $RPM_BUILD_ROOT/etc/logrotate.d/cron
 cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/cron
 cp -a %{SOURCE4} $RPM_BUILD_ROOT/etc/cron.d/crontab
 cp -a crond.pam  $RPM_BUILD_ROOT/etc/pam.d/crond
 cp -a %{SOURCE6} $RPM_BUILD_ROOT%{systemdunitdir}/crond.service
-
-touch $RPM_BUILD_ROOT/var/log/cron
 
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/cron/cron.allow << 'EOF'
 # cron.allow	This file describes the names of the users which are
@@ -156,9 +152,6 @@ rm -rf $RPM_BUILD_ROOT
 %groupadd -g 117 -r -f crontab
 
 %post
-if [ ! -f /var/log/cron ]; then
-	install -m 660 -g crontab /dev/null /var/log/cron
-fi
 /sbin/chkconfig --add crond
 %service crond restart "Cron Daemon"
 %systemd_post crond.service
@@ -216,7 +209,6 @@ chmod 754 /etc/rc.d/init.d/crond
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/cron
 %config(noreplace) %verify(not md5 mtime size) /etc/pam.d/crond
 %attr(754,root,root) /etc/rc.d/init.d/crond
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) /etc/logrotate.d/cron
 %{systemdunitdir}/crond.service
 %attr(755,root,root) %{_sbindir}/crond
 %attr(2755,root,crontab) %{_bindir}/crontab
@@ -227,7 +219,6 @@ chmod 754 /etc/rc.d/init.d/crond
 %{_mandir}/man1/crontab.1*
 
 %attr(1730,root,crontab) /var/spool/cron
-%attr(660,root,crontab) %ghost /var/log/cron
 
 %files anacron
 %defattr(644,root,root,755)
