@@ -33,6 +33,7 @@ URL:		https://fedorahosted.org/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
+BuildRequires:	glibc-devel >= 6:2.21
 %{?with_selinux:BuildRequires:	libselinux-devel}
 BuildRequires:	pam-devel
 BuildRequires:	rpm >= 4.4.9-56
