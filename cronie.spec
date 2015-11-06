@@ -17,7 +17,7 @@
 Summary:	Cron daemon for executing programs at set times
 Name:		cronie
 Version:	1.5.0
-Release:	2
+Release:	3
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -63,6 +63,9 @@ Obsoletes:	crontabs
 %if "%{pld_release}" == "th"
 Obsoletes:	vixie-cron < 4.3-1
 %endif
+Conflicts:	sysklogd < 1.5.1-2
+Conflicts:	syslog-ng < 3.6.4-3
+Conflicts:	rsyslog < 5.10.1-4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
