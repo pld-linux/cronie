@@ -15,6 +15,7 @@
 %endif
 
 Summary:	Cron daemon for executing programs at set times
+Summary(pl.UTF-8):	Demon cron do uruchamiania programów o zadanym czasie
 Name:		cronie
 Version:	1.5.1
 Release:	1
@@ -31,7 +32,7 @@ Patch0:		inotify-nosys.patch
 Patch1:		sendmail-path.patch
 URL:		https://fedorahosted.org/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
-BuildRequires:	autoconf
+BuildRequires:	autoconf >= 2.60
 BuildRequires:	automake
 BuildRequires:	glibc-devel >= 6:2.21
 %{?with_selinux:BuildRequires:	libselinux-devel}
@@ -72,10 +73,18 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Cronie contains the standard UNIX daemon crond that runs specified
 programs at scheduled times and related tools. It is based on the
 original cron and has security and configuration enhancements like the
-ability to use pam and SELinux.
+ability to use PAM and SELinux.
+
+%description -l pl.UTF-8
+Cronie zawiera standardowego demona uniksowego crond, uruchamiającego
+podane programy o zadanym czasie, oraz powiązane narzędzia. Jest
+oparty na oryginalnym cronie i zawiera rozszerzenia bezpieczeństwa i
+konfiguracji, takie jak możliwość wykorzystania mechanizmów PAM i
+SELinux.
 
 %package anacron
 Summary:	Utility for running regular jobs
+Summary(pl.UTF-8):	Narzędzie do uruchamiania regularnych zadań
 Group:		Base
 Provides:	anacron = 2.4
 Obsoletes:	anacron <= 2.3
@@ -84,6 +93,11 @@ Obsoletes:	anacron <= 2.3
 Anacron becames part of cronie. Anacron is used only for running
 regular jobs. The default settings execute regular jobs by anacron,
 however this could be overloaded in settings.
+
+%description anacron -l pl.UTF-8
+Anacron stał się częścią cronie. Służy tylko do uruchamiania
+regularnych zadań. Domyślne ustawienia wykonują zadania przy użyciu
+anacrona, ale może to być zmienione w ustawieniach.
 
 %prep
 %setup -q
@@ -100,16 +114,16 @@ however this could be overloaded in settings.
 	SYS_CROND_DIR=/etc/cron.d \
 	--sysconfdir=/etc/cron \
 	--with-editor=/bin/vi \
+	--with-audit%{!?with_audit:=no} \
+	--with-inotify%{!?with_inotify:=no} \
 	--with-pam \
-	--with%{!?with_selinux:out}-selinux \
-	--with%{!?with_audit:out}-audit \
-	--with%{!?with_inotify:out}-inotify \
+	--with-selinux%{!?with_selinux:=no} \
 	--disable-syscrontab \
+	--enable-anacron \
 %if "%{cc_version}" >= "3.4"
 	--enable-pie \
 %endif
-	--enable-relro \
-	--enable-anacron
+	--enable-relro
 
 %{__make}
 
