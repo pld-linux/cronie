@@ -18,7 +18,7 @@ Summary:	Cron daemon for executing programs at set times
 Summary(pl.UTF-8):	Demon cron do uruchamiania programów o zadanym czasie
 Name:		cronie
 Version:	1.5.1
-Release:	1
+Release:	1.1
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
@@ -54,6 +54,7 @@ Requires:	systemd-units >= 38}
 %{?with_inotify:Requires:	uname(release) >= 2.6.13}
 Provides:	crondaemon
 Provides:	crontabs = 1.7
+Provides:	cronjobs
 Provides:	group(crontab)
 %if "%{pld_release}" == "th"
 Provides:	vixie-cron = 4.3-1
@@ -61,6 +62,7 @@ Provides:	vixie-cron = 4.3-1
 Obsoletes:	crondaemon
 Obsoletes:	cronie-systemd
 Obsoletes:	crontabs
+Obsoletes:	cronjobs
 %if "%{pld_release}" == "th"
 Obsoletes:	vixie-cron < 4.3-1
 %endif
