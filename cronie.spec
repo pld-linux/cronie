@@ -21,7 +21,7 @@ Version:	1.5.1
 Release:	2
 License:	MIT and BSD and GPL v2
 Group:		Daemons
-Source0:	https://fedorahosted.org/releases/c/r/cronie/%{name}-%{version}.tar.gz
+Source0:	https://github.com/cronie-crond/cronie/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	910e6effcc032998b0a49fbd46322e18
 Source1:	%{name}.init
 Source3:	cron.sysconfig
@@ -30,7 +30,7 @@ Source5:	%{name}.pam
 Source6:	crond.service
 Patch0:		inotify-nosys.patch
 Patch1:		sendmail-path.patch
-URL:		https://fedorahosted.org/cronie/
+URL:		https://github.com/cronie-crond/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
 BuildRequires:	autoconf >= 2.60
 BuildRequires:	automake
