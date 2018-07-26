@@ -17,12 +17,12 @@
 Summary:	Cron daemon for executing programs at set times
 Summary(pl.UTF-8):	Demon cron do uruchamiania programów o zadanym czasie
 Name:		cronie
-Version:	1.5.1
-Release:	2
+Version:	1.5.2
+Release:	1
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://github.com/cronie-crond/cronie/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	910e6effcc032998b0a49fbd46322e18
+# Source0-md5:	703314f58a49ea136e9966d3937d9bf4
 Source1:	%{name}.init
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
@@ -231,11 +231,13 @@ chmod 754 /etc/rc.d/init.d/crond
 %attr(754,root,root) /etc/rc.d/init.d/crond
 %{systemdunitdir}/crond.service
 %attr(755,root,root) %{_sbindir}/crond
+%attr(2755,root,crontab) %{_bindir}/cronnext
 %attr(2755,root,crontab) %{_bindir}/crontab
 
 %{_mandir}/man8/crond.8*
 %{_mandir}/man8/cron.8*
 %{_mandir}/man5/crontab.5*
+%{_mandir}/man1/cronnext.1*
 %{_mandir}/man1/crontab.1*
 
 %attr(1730,root,crontab) /var/spool/cron
