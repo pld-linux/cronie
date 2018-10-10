@@ -2,4 +2,4 @@
 auth		include		system-auth
 account		include		system-auth
 session		include		system-auth
-session		required	pam_loginuid.so
+session		optional	pam_loginuid.so
