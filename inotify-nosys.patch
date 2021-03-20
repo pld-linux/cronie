@@ -1,20 +1,7 @@
---- cronie-1.4.1/src/cron.c~	2009-06-01 10:46:08.000000000 +0300
-+++ cronie-1.4.1/src/cron.c	2009-08-13 13:32:40.909067818 +0300
-@@ -41,7 +41,11 @@
- #include <unistd.h>
- 
- #ifdef WITH_INOTIFY
-+#ifdef SYS_INOTIFY_H_EXISTS_AND_WORKS
- # include <sys/inotify.h>
-+#else
-+#include "inotify-nosys.h"
-+#endif
- #endif
- 
- #ifdef HAVE_SYS_FCNTL_H
---- cronie-1.4.1/configure.ac~	2009-08-13 13:56:08.000000000 +0300
-+++ cronie-1.4.1/configure.ac	2009-08-13 13:56:11.295316050 +0300
-@@ -27,7 +27,6 @@
+diff -urNp -x '*.orig' cronie-1.5.6.org/configure.ac cronie-1.5.6/configure.ac
+--- cronie-1.5.6.org/configure.ac	2021-03-17 16:34:06.000000000 +0100
++++ cronie-1.5.6/configure.ac	2021-03-20 23:36:43.706964317 +0100
+@@ -30,7 +30,6 @@ AC_CHECK_HEADERS( \
          stddef.h \
          stdint.h \
          sys/audit.h \
@@ -22,7 +9,7 @@
          sys/stat.h \
          sys/stream.h \
          sys/stropts.h \
-@@ -106,9 +105,16 @@
+@@ -119,9 +118,16 @@ AC_SUBST(DAEMON_GROUPNAME)
  AC_ARG_WITH(inotify,
     [AS_HELP_STRING([--with-inotify], [ Enable inotify support])],
     [ if test "x$withval" != "xno" ; then
@@ -41,8 +28,24 @@
       fi
     ]
  )
---- /dev/null	2008-11-04 20:33:38.146691408 +0200
-+++ cronie-1.4.1/src/inotify-nosys.h	2007-12-30 10:50:22.000000000 +0200
+diff -urNp -x '*.orig' cronie-1.5.6.org/src/cron.c cronie-1.5.6/src/cron.c
+--- cronie-1.5.6.org/src/cron.c	2021-01-22 12:29:39.000000000 +0100
++++ cronie-1.5.6/src/cron.c	2021-03-20 23:36:43.706964317 +0100
+@@ -43,7 +43,11 @@
+ #include <fcntl.h>
+ 
+ #ifdef WITH_INOTIFY
++#ifdef SYS_INOTIFY_H_EXISTS_AND_WORKS
+ # include <sys/inotify.h>
++#else
++#include "inotify-nosys.h"
++#endif
+ #endif
+ 
+ #include "cronie_common.h"
+diff -urNp -x '*.orig' cronie-1.5.6.org/src/inotify-nosys.h cronie-1.5.6/src/inotify-nosys.h
+--- cronie-1.5.6.org/src/inotify-nosys.h	1970-01-01 01:00:00.000000000 +0100
++++ cronie-1.5.6/src/inotify-nosys.h	2021-03-20 23:36:43.706964317 +0100
 @@ -0,0 +1,167 @@
 +/*
 + * This header is used if <sys/inotify.h> cannot be found.
