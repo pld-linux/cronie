@@ -17,12 +17,12 @@
 Summary:	Cron daemon for executing programs at set times
 Summary(pl.UTF-8):	Demon cron do uruchamiania programów o zadanym czasie
 Name:		cronie
-Version:	1.5.6
+Version:	1.5.7
 Release:	1
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://github.com/cronie-crond/cronie/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	ab781ac078c46dded86405c18ed56e8c
+# Source0-md5:	544f141aa4e34e0a176529be08441756
 Source1:	%{name}.init
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
