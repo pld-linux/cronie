@@ -18,7 +18,7 @@ Summary:	Cron daemon for executing programs at set times
 Summary(pl.UTF-8):	Demon cron do uruchamiania programów o zadanym czasie
 Name:		cronie
 Version:	1.5.7
-Release:	2
+Release:	4
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://github.com/cronie-crond/cronie/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -166,6 +166,18 @@ cat > $RPM_BUILD_ROOT%{_sysconfdir}/cron/cron.deny << 'EOF'
 #		NOT allowed to use the local cron daemon
 EOF
 
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/cron.daily/check-crond << 'EOF'
+#!/bin/sh
+
+# ugly and limited hack. make cronie restart itself
+if [ -x /bin/awk -a -x /bin/grep -a -f /var/log/cron ]; then
+	LC_ALL=C /bin/awk -v d="$(LC_ALL=C date "+%b %e")" ' $1 " " $2 ~ d' /var/log/cron \
+		| /bin/grep -qE "PAM.*(Modu. jest nieznany|Module is unknown)" \
+		&& echo "crond is failing on PAM, restarting ( https://github.com/cronie-crond/cronie/issues/87 )" >&2 \
+		&& /sbin/service crond restart
+fi
+EOF
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -221,6 +233,7 @@ chmod 754 /etc/rc.d/init.d/crond
 %doc AUTHORS ChangeLog README
 %attr(750,root,crontab) %dir /etc/cron
 %attr(750,root,crontab) %dir /etc/cron.daily
+%attr(750,root,root) /etc/cron.daily/check-crond
 %attr(750,root,crontab) %dir /etc/cron.hourly
 %attr(750,root,crontab) %dir /etc/cron.monthly
 %attr(750,root,crontab) %dir /etc/cron.weekly
