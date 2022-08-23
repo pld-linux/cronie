@@ -17,12 +17,12 @@
 Summary:	Cron daemon for executing programs at set times
 Summary(pl.UTF-8):	Demon cron do uruchamiania programów o zadanym czasie
 Name:		cronie
-Version:	1.5.7
-Release:	7
+Version:	1.6.1
+Release:	1
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 Source0:	https://github.com/cronie-crond/cronie/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	544f141aa4e34e0a176529be08441756
+# Source0-md5:	de07b7229520bc859d987c721bab87c5
 Source1:	%{name}.init
 Source3:	cron.sysconfig
 Source4:	%{name}.crontab
@@ -174,7 +174,7 @@ if [ -x /bin/awk -a -x /bin/grep -a -f /var/log/cron ]; then
 	LC_ALL=C /bin/awk -v d="$(LC_ALL=C date "+%b %e")" ' $1 " " $2 ~ d' /var/log/cron \
 		| /bin/grep -qE "PAM.*(Modu. jest nieznany|Module is unknown)" \
 		&& echo "crond is failing on PAM, restarting ( https://github.com/cronie-crond/cronie/issues/87 )" >&2 \
-		&& /sbin/service crond condrestart
+		&& /sbin/service crond try-restart
 fi
 exit 0
 EOF
