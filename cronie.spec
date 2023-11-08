@@ -60,7 +60,8 @@ Provides:	group(crontab)
 Provides:	vixie-cron = 4.3-1
 %endif
 Obsoletes:	crondaemon
-Obsoletes:	cronie-systemd
+Obsoletes:	cronie-systemd < 1.4.8-9
+Obsoletes:	cronie-upstart < 1.4.12-5
 Obsoletes:	crontabs
 Obsoletes:	cronjobs
 %if "%{pld_release}" == "th"
