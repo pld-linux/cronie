@@ -29,5 +29,5 @@
 -AC_DEFINE(MAILARG,"/usr/sbin/sendmail",[There will be path to sendmail.])
 +AC_DEFINE(MAILARG,"/usr/lib/sendmail",[There will be path to sendmail.])
  
- AC_DEFINE(MAILFMT,"%s -FCronDaemon -i -odi -oem -oi -t -f <>",
+ AC_DEFINE(MAILFMT,"%s -FCronDaemon -i -odi -oem -oi -t -f %s",
  [-i    = don't terminate on "." by itself
