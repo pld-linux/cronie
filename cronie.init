@@ -17,9 +17,19 @@
 . /etc/rc.d/init.d/functions
 
 CROND_ARGS=""
+PIDFILE="/var/run/crond.pid"
+CROND_OOM_ADJUST=-200
 
 # Get service config
 [ -f /etc/sysconfig/cron ] && . /etc/sysconfig/cron
+
+adjust_oom() {
+    if [ -e $PIDFILE ]; then
+	for pid in $(cat $PIDFILE); do
+	    echo "$CROND_OOM_ADJUST" 2>/dev/null > /proc/$pid/oom_score_adj
+	done
+    fi
+}
 
 start() {
 	# Check if the service is already running?
@@ -41,6 +51,7 @@ start() {
 	daemon /usr/sbin/crond $CROND_ARGS
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/crond
+	adjust_oom
 }
 
 stop() {
