@@ -1,0 +1,22 @@
+Range parsing fixes from upstream: Sunday as 0 ends a day-of-week range
+(fri-sun), reversed ranges are rejected instead of silently never matching.
+https://github.com/cronie-crond/cronie/commit/d0370421
+https://github.com/cronie-crond/cronie/commit/e6c28538
+https://github.com/cronie-crond/cronie/commit/1c3f74e7
+https://github.com/cronie-crond/cronie/commit/6126a7b3
+
+--- cronie-1.7.2.orig/src/entry.c	2023-10-13 10:38:39.000000000 +0200
++++ cronie-1.7.2/src/entry.c	2026-10-28 23:51:44.432458409 +0100
+@@ -634,6 +634,12 @@ get_range(bitstr_t * bits, int low, int
+ 				return (EOF);
+ 
+ 			case R_RANGE_NUM2:
++				if (low_ > high_ && high_ == 0 && high == LAST_DOW) {
++					high_ = 7;
++				}
++				if (low_ > high_) {
++					return (EOF);
++				}
+ 				if (ch == '/') {
+ 					state = R_STEP;
+ 					break;
