@@ -1,0 +1,236 @@
+Apply NICE= from crontabs as a nice(1) increment, after switching to the
+job user; without it NICE=15 in PLD's /etc/cron.d/crontab does nothing.
+
+Why the autogroup: every job calls setsid(), and with
+CONFIG_SCHED_AUTOGROUP a new session is a new autogroup at nice 0.  In
+the root CPU cgroup sessions compete as a whole, so the job's own nice
+alone would not lower its CPU share against other sessions (sched(7)).
+
+How: after nice() the job writes its niceness to /proc/self/autogroup.
+The file is opened before dropping root, as /proc/self is root-owned
+afterwards; the kernel checks the written value against the job user.
+Writes without CAP_SYS_ADMIN are limited to one per 100 ms system-wide
+(EAGAIN), which comes only after the permission checks, so on EAGAIN the
+job passes the value to its crond parent, still root, to repeat it, and
+waits until crond closes the socket, so it never starts in an autogroup
+at nice 0.
+
+diff -urNp cronie-1.7.2.orig/man/crontab.5 cronie-1.7.2/man/crontab.5
+--- cronie-1.7.2.orig/man/crontab.5	2024-04-08 10:06:00.000000000 +0200
++++ cronie-1.7.2/man/crontab.5	2026-10-30 09:20:12.455885861 +0100
+@@ -157,6 +157,27 @@ upper limit specified by the variable. T
+ determined during the cron daemon startup so it remains constant for
+ the whole run time of the daemon.
+ .PP
++The
++.I NICE
++variable adjusts the niceness of jobs by the given increment, as
++.B nice \-n
++does (see
++.BR nice (1));
++the resulting niceness is limited to the range from \-20 to 19.
++The increment is applied after switching to the job user, so a negative
++value works only for root or within the user's
++.B RLIMIT_NICE
++(see
++.BR setrlimit (2)).
++The job's session gets the same autogroup nice value, so the job also
++yields to other sessions; in a cgroup with the cpu controller, niceness
++only ranks the job against processes of the same cgroup (see
++.BR sched (7)).
++An invalid value is logged when the crontab is loaded and ignored.
++If the kernel refuses the adjustment, the job keeps its niceness; if it
++refuses only the autogroup change, the job runs with the new niceness in
++an autogroup at nice 0.  Both are logged when the job starts.
++.PP
+ The format of a cron command is similar to the V7 standard, with a number
+ of upward-compatible extensions.  Each line has five time-and-date fields
+ followed by a
+diff -urNp cronie-1.7.2.orig/src/do_command.c cronie-1.7.2/src/do_command.c
+--- cronie-1.7.2.orig/src/do_command.c	2024-01-19 11:20:51.000000000 +0100
++++ cronie-1.7.2/src/do_command.c	2026-10-30 09:34:54.528776030 +0100
+@@ -23,11 +23,13 @@
+ 
+ #include <ctype.h>
+ #include <errno.h>
++#include <fcntl.h>
+ #include <pwd.h>
+ #include <signal.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/socket.h>
+ #include <sys/wait.h>
+ #include <unistd.h>
+ #include <dirent.h>
+@@ -44,6 +46,8 @@
+ 
+ static int child_process(entry *, char **);
+ static int safe_p(const char *, const char *);
++static void set_job_nice(int, int, int);
++static void finish_job_autogroup(pid_t, int[2]);
+ 
+ void do_command(entry * e, user * u) {
+ 	pid_t pid = getpid();
+@@ -96,6 +100,8 @@ static int child_process(entry * e, char
+ 	int children = 0;
+ 	pid_t pid = getpid();
+ 	pid_t jobpid = -1;
++	int autogroup_fd = -1;
++	int nice_sock[2] = { -1, -1 };
+ 	struct sigaction sa;
+ 
+ 	/* Ignore SIGPIPE as we will be writing to pipes and do not want to terminate
+@@ -199,6 +205,10 @@ static int child_process(entry * e, char
+ 	}
+ 
+ 
++	/* the job hands crond an autogroup write the rate limit refused */
++	if (e->nice != 0 && socketpair(AF_UNIX, SOCK_STREAM, 0, nice_sock) == -1)
++		log_it("CRON", pid, "SOCKETPAIR() FAILED", "nice_sock", errno);
++
+ 	/* fork again, this time so we can exec the user's command.
+ 	 */
+ 	switch (jobpid = fork()) {
+@@ -224,6 +234,13 @@ static int child_process(entry * e, char
+ 			free(x);
+ 		}
+ 
++		/* /proc/self turns root-owned when root is dropped, so open it now;
++		 * the kernel checks the written value against the job user */
++		if (e->nice != 0 &&
++			(autogroup_fd = open("/proc/self/autogroup", O_WRONLY)) < 0 &&
++			errno != ENOENT)	/* ENOENT: no CONFIG_SCHED_AUTOGROUP */
++			log_it("CRON", getpid(), "AUTOGROUP OPEN FAILED", "/proc/self/autogroup", errno);
++
+ 		if (cron_change_user_permanently(e->pwd, env_get("HOME", jobenv)) < 0)
+ 			_exit(ERROR_EXIT);
+ 
+@@ -231,6 +248,11 @@ static int child_process(entry * e, char
+ 		 */
+ 		(void) setsid();
+ 
++		if (nice_sock[0] >= 0)
++			close(nice_sock[0]);
++		if (e->nice != 0)
++			set_job_nice(e->nice, autogroup_fd, nice_sock[1]);
++
+ 		/* reset the SIGPIPE back to default so the child will terminate
+ 		 * if it tries to write to a closed pipe
+ 		 */
+@@ -306,6 +328,9 @@ static int child_process(entry * e, char
+ 		break;
+ 	}
+ 
++	if (nice_sock[0] >= 0)
++		finish_job_autogroup(jobpid, nice_sock);
++
+ 	children++;
+ 
+ 	/* middle process, child of original cron, parent of process running
+@@ -682,3 +707,58 @@ static int safe_p(const char *usernm, co
+ 	}
+ 	return (TRUE);
+ }
++
++/* Called as the job user, so the kernel decides who may lower niceness
++ * (root, RLIMIT_NICE), and after setsid(): with autogroups the new session
++ * competes for CPU as a whole, so it gets the job's niceness too.
++ */
++static void set_job_nice(int inc, int autogroup_fd, int crond_fd) {
++	char buf[16], eof;
++	int len, niceness;
++
++	errno = 0;
++	niceness = nice(inc);
++	if (niceness == -1 && errno != 0) {
++		snprintf(buf, sizeof buf, "%d", inc);
++		log_it("CRON", getpid(), "NICE FAILED", buf, errno);
++	}
++	else if (autogroup_fd >= 0) {
++		len = snprintf(buf, sizeof buf, "%d", niceness);
++		/* EAGAIN comes after the kernel's permission checks, only the rate
++		 * limit for writers without CAP_SYS_ADMIN refused it: crond retries,
++		 * and the job waits for that so it does not run at autogroup nice 0 */
++		if (write(autogroup_fd, buf, (size_t)len) < 0) {
++			if (errno == EAGAIN && crond_fd >= 0 &&
++				write(crond_fd, &niceness, sizeof niceness) == sizeof niceness) {
++				while (read(crond_fd, &eof, 1) < 0 && errno == EINTR) ;
++			}
++			else
++				log_it("CRON", getpid(), "AUTOGROUP NICE FAILED", buf, errno);
++		}
++	}
++	if (autogroup_fd >= 0)
++		close(autogroup_fd);
++}
++
++/* Runs in crond's process, still root, which the rate limit does not apply to.
++ * Reads EOF when the job closes its descriptors before exec; after a handed
++ * over write, closing the socket lets the job go on, whatever the result.
++ */
++static void finish_job_autogroup(pid_t jobpid, int nice_sock[2]) {
++	char path[64], buf[16];
++	int fd, len, niceness;
++	ssize_t n;
++
++	close(nice_sock[1]);
++	while ((n = read(nice_sock[0], &niceness, sizeof niceness)) < 0 &&
++		errno == EINTR) ;
++	if (n == sizeof niceness) {
++		snprintf(path, sizeof path, "/proc/%ld/autogroup", (long) jobpid);
++		len = snprintf(buf, sizeof buf, "%d", niceness);
++		if ((fd = open(path, O_WRONLY)) < 0 || write(fd, buf, (size_t)len) < 0)
++			log_it("CRON", getpid(), "AUTOGROUP NICE FAILED", buf, errno);
++		if (fd >= 0)
++			close(fd);
++	}
++	close(nice_sock[0]);	/* the job's acknowledgement: EOF */
++}
+diff -urNp cronie-1.7.2.orig/src/entry.c cronie-1.7.2/src/entry.c
+--- cronie-1.7.2.orig/src/entry.c	2026-10-30 07:26:14.520729918 +0100
++++ cronie-1.7.2/src/entry.c	2026-10-30 08:42:53.573530855 +0100
+@@ -36,6 +36,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <errno.h>
++#include <limits.h>
+ 
+ #include "bitstring.h"
+ #include "funcs.h"
+@@ -347,6 +348,24 @@ entry *load_entry(FILE * file, void (*er
+ 		}
+ 	}
+ 
++	p = env_get("NICE", envp);
++	if (p && *p) {
++		char *endptr;
++		long val;
++
++		val = strtol(p, &endptr, 10);
++		if (endptr == p || *endptr != '\0') {
++			log_it("CRON", getpid(), "ERROR", "bad value of NICE", 0);
++		} else {
++			/* same bounds as nice(1); niceness itself stops at -20..19 */
++			if (val < 1 - 2 * NZERO)
++				val = 1 - 2 * NZERO;
++			else if (val > 2 * NZERO - 1)
++				val = 2 * NZERO - 1;
++			e->nice = (int)val;
++		}
++	}
++
+ 	/* copy and fix up environment.  some variables are just defaults and
+ 	 * others are overrides.
+ 	 */
+diff -urNp cronie-1.7.2.orig/src/structs.h cronie-1.7.2/src/structs.h
+--- cronie-1.7.2.orig/src/structs.h	2023-03-13 09:20:25.000000000 +0100
++++ cronie-1.7.2/src/structs.h	2026-10-30 08:42:53.565674069 +0100
+@@ -42,6 +42,7 @@ typedef	struct _entry {
+ 	bitstr_t	bit_decl(dow,    DOW_COUNT);
+ 	int		flags;
+ 	int		delay;
++	int		nice;
+ #define	MIN_STAR	0x01
+ #define	HR_STAR		0x02
+ #define	DOM_STAR	0x04

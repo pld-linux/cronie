@@ -18,7 +18,7 @@ Summary:	Cron daemon for executing programs at set times
 Summary(pl.UTF-8):	Demon cron do uruchamiania programów o zadanym czasie
 Name:		cronie
 Version:	1.7.2
-Release:	3
+Release:	4
 License:	MIT and BSD and GPL v2
 Group:		Daemons
 #Source0Download: https://github.com/cronie-crond/cronie/releases
@@ -34,6 +34,7 @@ Patch1:		sendmail-path.patch
 Patch2:		range-parsing.patch
 Patch3:		crontab-backup-mkdir.patch
 Patch4:		error-func-prototype.patch
+Patch5:		crontab-nice.patch
 URL:		https://github.com/cronie-crond/cronie/
 %{?with_audit:BuildRequires:	audit-libs-devel}
 BuildRequires:	autoconf >= 2.60
@@ -113,6 +114,7 @@ anacrona, ale może to być zmienione w ustawieniach.
 %patch -P2 -p1
 %patch -P3 -p1
 %patch -P4 -p1
+%patch -P5 -p1
 
 %build
 %{__aclocal}
